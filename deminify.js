@@ -6,6 +6,7 @@ const prettier = require('prettier')
 ;(async()=>{
 const calculatorJSRaw = await readFile('./calculator.js')
 const calculatorJSRawString = calculatorJSRaw.toString()
+const dry = true
 
 const moduleBody =
   acorn.parse(
@@ -68,7 +69,6 @@ function isString(expr) {
 }
 
 async function emit(path, body) {
-  console.log('Emitting', path)
   const outFile = `output/${path}.js`
   const outContent = prettier.format(
     body,
@@ -80,8 +80,13 @@ async function emit(path, body) {
       parser: 'babel',
     }
   )
-  await mkdirp(outFile.split('/').slice(0,-1).join('/'))
-  await writeFile(outFile, outContent)
+  console.log('Emitting', path)
+  if (dry) {
+    console.log(outContent)
+  } else {
+    await mkdirp(outFile.split('/').slice(0,-1).join('/'))
+    await writeFile(outFile, outContent)
+  }
 }
 
 function extractRaw (node) {
@@ -90,9 +95,11 @@ function extractRaw (node) {
   return calculatorJSRawString.substring(node.start, node.end)
 }
 
-await rmdir('output', {
-  recursive: true
-})
+if (!dry) {
+  await rmdir('output', {
+    recursive: true
+  })
+}
 
 const limit = 5
 let i=0
