@@ -9,6 +9,8 @@
   "author": "Jared Hughes",
   "license": "MIT",
   "dependencies": {
-    "acorn": "^8.1.0"
+    "acorn": "^8.1.0",
+    "mkdirp": "^1.0.4",
+    "prettier": "^2.2.1"
   }
 }
