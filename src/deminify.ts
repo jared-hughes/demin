@@ -1,47 +1,45 @@
-const acorn = require('acorn')
-const { rmdir, readFile } = require('fs/promises')
-const { matches, isString, isArrayOf } = require('./match')
-const { handleDefineStatement } = require('./visit')
+import { parse } from 'acorn'
+import { rmdir, readFile } from 'fs/promises'
+import { matches, isString, isArrayOf } from './match'
+import { handleDefineStatement } from './visit'
 
-function isDefineCall (statement) {
+function isDefineCall(statement: any) {
   return matches(statement, {
     type: 'ExpressionStatement',
     expression: {
       type: 'CallExpression',
       callee: {
         type: 'Identifier',
-        name: 'define'
+        name: 'define',
       },
       arguments: [
         isString,
         isArrayOf(isString),
         {
-          type: 'FunctionExpression'
+          type: 'FunctionExpression',
           // params: isArrayOf({ type: 'Identifier' })
           // assume function (require, exports, i, etc) {}
-        }
-      ]
-    }
+        },
+      ],
+    },
   })
 }
 
-function parseSource (source) {
-  return acorn.parse(
-    source,
-    {
-      ecmaVersion: 6
-    }
-  ).body
+function parseSource(source: string) {
+  const parsed = parse(source, {
+    ecmaVersion: 6,
+  })
+  return (parsed as any).body
 }
 
-async function deminifyFile (definePath, opts) {
-  /*
-   * opts:
-   *   dry: boolean = false
-   *   outputFolder: string (path) = 'output'
-   *   start: number = 0
-   *   end: number = Infinity
-   */
+export interface DeminifyOptions {
+  dry: boolean
+  outputFolder: string
+  start: number
+  end: number
+}
+
+async function deminifyFile(definePath: string, opts: DeminifyOptions) {
   opts.dry ??= false
   opts.outputFolder ??= 'output'
   opts.start ??= 0
@@ -52,11 +50,11 @@ async function deminifyFile (definePath, opts) {
   // instead of once for every extractRaw call
   const sourceString = source.toString()
 
-  const parsed = parseSource(source)
+  const parsed = parseSource(sourceString)
 
   if (!opts.dry) {
-    await rmdir('output', {
-      recursive: true
+    await rmdir(opts.outputFolder, {
+      recursive: true,
     })
   }
 
@@ -77,5 +75,5 @@ deminifyFile('./calculator.js', {
   outputFolder: 'output',
   dry: false,
   start: 6,
-  end: 10
+  end: 10,
 })
