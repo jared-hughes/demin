@@ -4,18 +4,14 @@ import * as path from 'path'
 import mkdirp from 'mkdirp'
 import { DeminifyOptions } from './deminify'
 
-export function extractRaw(sourceString: string, node: any) {
-  // .slice() doesn't properly handle multi-byte characters, but
-  // .substring() does properly.
-  return sourceString.substring(node.start, node.end)
-}
-
 export async function emit(
   definePath: string,
   body: string,
   opts: DeminifyOptions,
 ) {
   const outFile = path.join(opts.outputFolder, `${definePath}.js`)
+  // escodegen is not minified, so is prettier necessary?
+  // it certainly changes the output, but is it preferred?
   const outContent = prettier.format(body, {
     semi: false,
     singleQuote: true,
