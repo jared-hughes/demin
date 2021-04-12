@@ -12,5 +12,8 @@
     "acorn": "^8.1.0",
     "mkdirp": "^1.0.4",
     "prettier": "^2.2.1"
+  },
+  "devDependencies": {
+    "standard": "^16.0.3"
   }
 }
