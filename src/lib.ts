@@ -12,16 +12,25 @@ export async function emit(
   const outFile = path.join(opts.outputFolder, `${definePath}.js`)
   // escodegen is not minified, so is prettier necessary?
   // it certainly changes the output, but is it preferred?
-  const outContent = prettier.format(body, {
-    semi: false,
-    singleQuote: true,
-    jsxSingleQuote: true,
-    trailingComma: 'none',
-    parser: 'babel',
-  })
+  const outContent = opts.prettier
+    ? prettier.format(body, {
+        semi: false,
+        singleQuote: true,
+        jsxSingleQuote: true,
+        trailingComma: 'none',
+        parser: 'babel',
+      })
+    : body
   console.log('Emitting', definePath)
   if (!opts.dry) {
     await mkdirp(path.join(outFile, '..'))
     await writeFile(outFile, outContent)
   }
+}
+
+export function clearAssign(to: any, from: any) {
+  for (const prop in to) {
+    delete to[prop]
+  }
+  Object.assign(to, from)
 }

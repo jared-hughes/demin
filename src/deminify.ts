@@ -9,6 +9,7 @@ export interface DeminifyOptions {
   dry: boolean
   outputFolder: string
   limit: number
+  prettier: boolean
 }
 
 async function deminifyFile(definePath: string, opts: DeminifyOptions) {
@@ -26,12 +27,13 @@ async function deminifyFile(definePath: string, opts: DeminifyOptions) {
   const transformer = new Transformer(parsed, opts)
   estraverse.traverse(parsed, {
     enter: (node) => transformer.transformEnter(node),
-    leave: (node) => transformer.transformLeave(node),
+    leave: (node, parent) => transformer.transformLeave(node, parent),
   })
 }
 
 deminifyFile('./calculator.js', {
   outputFolder: 'output',
   dry: false,
-  limit: 10,
+  limit: Infinity,
+  prettier: true,
 })
