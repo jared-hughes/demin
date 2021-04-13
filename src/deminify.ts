@@ -10,6 +10,7 @@ export interface DeminifyOptions {
   outputFolder: string
   limit: number
   prettier: boolean
+  logging: 'none' | 'verbose'
 }
 
 async function deminifyFile(definePath: string, opts: DeminifyOptions) {
@@ -36,4 +37,5 @@ deminifyFile('./calculator.js', {
   dry: false,
   limit: Infinity,
   prettier: true,
+  logging: 'verbose',
 })

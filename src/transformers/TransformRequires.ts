@@ -153,7 +153,7 @@ export default function TransformRequires<
             break
           }
         }
-        if (!succeeded) {
+        if (!succeeded && this.opts.logging === 'verbose') {
           console.warn(
             `Duplicate variable, may cause conflicts: ${variableName}`,
           )
@@ -192,7 +192,11 @@ export default function TransformRequires<
             // node must be an estree.Identifier
             const moduleName = this.dependencyMap.get(node.name)
             if (moduleName === undefined) {
-              console.warn(`Unhandled namespace module variable: ${node.name}`)
+              if (this.opts.logging === 'verbose') {
+                console.warn(
+                  `Unhandled namespace module variable: ${node.name}`,
+                )
+              }
               continue
             }
             dependenciesUsedAsNonDefault.add(moduleName)
@@ -213,9 +217,11 @@ export default function TransformRequires<
               node.memberExpression.object.name,
             )
             if (moduleName === undefined) {
-              console.warn(
-                `'Unhandled default module variable: ${node.memberExpression.object.name}`,
-              )
+              if (this.opts.logging === 'verbose') {
+                console.warn(
+                  `'Unhandled default module variable: ${node.memberExpression.object.name}`,
+                )
+              }
               continue
             }
             dependenciesUsedAsDefault.add(moduleName)

@@ -20,46 +20,6 @@ export type DefineFunc = {
   ]
 } & estree.CallExpression
 
-function isDefineFunc(
-  node: estree.Node,
-  warnOnUnhandled = false,
-): node is DefineFunc {
-  if (
-    node.type === 'CallExpression' &&
-    node.callee.type === 'Identifier' &&
-    node.callee.name === 'define'
-  ) {
-    const args = node.arguments
-    const isDefine =
-      args.length === 3 &&
-      args[0].type === 'Literal' &&
-      typeof args[0].value === 'string' &&
-      args[1].type === 'ArrayExpression' &&
-      args[1].elements.every(
-        (e) =>
-          e !== null && e.type === 'Literal' && typeof e.value === 'string',
-      ) &&
-      args[2].type === 'FunctionExpression' &&
-      // must include require
-      args[2].params.length >= 1 &&
-      args[2].params.every((e) => e.type === 'Identifier')
-    if (isDefine) {
-      return true
-    } else if (warnOnUnhandled) {
-      const module = args[0].type === 'Literal' ? args[0].value : ''
-      console.warn(
-        `Unhandled define() case: define(${
-          module ? `'${module}', ` : ''
-        }${node.arguments
-          .slice(module ? 1 : 0)
-          .map((e) => e.type)
-          .join(', ')})`,
-      )
-    }
-  }
-  return false
-}
-
 // mixin
 export default class TotalTransformer extends TransformTrivials(
   TransformRequires(TrackScope(TransformerBase)),
@@ -71,10 +31,50 @@ export default class TotalTransformer extends TransformTrivials(
     // declares `public opts`, so presumably it will do this automatically
     this.opts = opts
   }
+
+  isDefineFunc(node: estree.Node, warnOnUnhandled = false): node is DefineFunc {
+    if (
+      node.type === 'CallExpression' &&
+      node.callee.type === 'Identifier' &&
+      node.callee.name === 'define'
+    ) {
+      const args = node.arguments
+      const isDefine =
+        args.length === 3 &&
+        args[0].type === 'Literal' &&
+        typeof args[0].value === 'string' &&
+        args[1].type === 'ArrayExpression' &&
+        args[1].elements.every(
+          (e) =>
+            e !== null && e.type === 'Literal' && typeof e.value === 'string',
+        ) &&
+        args[2].type === 'FunctionExpression' &&
+        // must include require
+        args[2].params.length >= 1 &&
+        args[2].params.every((e) => e.type === 'Identifier')
+      if (isDefine) {
+        return true
+      } else if (warnOnUnhandled) {
+        const module = args[0].type === 'Literal' ? args[0].value : ''
+        if (this.opts.logging === 'verbose') {
+          console.warn(
+            `Unhandled define() case: define(${
+              module ? `'${module}', ` : ''
+            }${node.arguments
+              .slice(module ? 1 : 0)
+              .map((e) => e.type)
+              .join(', ')})`,
+          )
+        }
+      }
+    }
+    return false
+  }
+
   transformEnter(node: estree.Node, parent: estree.Node | null) {
     // I suggest https://astexplorer.net/ to find the JSON to generate
     // for replacements.
-    if (!this.currentModuleDefineNode && isDefineFunc(node, true)) {
+    if (!this.currentModuleDefineNode && this.isDefineFunc(node, true)) {
       this.currentModuleDefineNode = node
       this.onEnterModule(node)
     }

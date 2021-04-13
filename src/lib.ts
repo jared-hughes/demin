@@ -22,7 +22,9 @@ export async function emit(
         parser: 'babel',
       })
     : body
-  console.log('Emitting', definePath)
+  if (opts.logging === 'verbose') {
+    console.log('Emitting', definePath)
+  }
   if (!opts.dry) {
     await mkdirp(path.join(outFile, '..'))
     await writeFile(outFile, outContent)
