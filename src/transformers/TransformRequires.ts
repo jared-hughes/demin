@@ -99,6 +99,10 @@ function isIdentifierUsedForDefault(
   )
 }
 
+function validIdentifierStartCharacter(id: string) {
+  return /^[a-zA-Z_$]/.test(id)
+}
+
 // Mixin pattern following http://web.archive.org/web/20210304140204/https://www.typescriptlang.org/docs/handbook/mixins.html
 export default function TransformRequires<
   TBase extends ReturnType<typeof TrackScope>
@@ -119,7 +123,19 @@ export default function TransformRequires<
       // Split on `!` to handle applied loader plugins like 'loadjs!file'
       //   (note: there is no special handling for loader plugins; they just get ignored)
       const parts = moduleName.split(/[!/]/)
-      const baseName = parts[parts.length - 1]
+      let baseName = parts[parts.length - 1]
+      // don't start with a digit; try to prepend earlier components
+      // of the require path before giving up and just putting an 'M'
+      for (
+        let i = parts.length - 2;
+        !validIdentifierStartCharacter(baseName) && i >= 0;
+        i--
+      ) {
+        baseName = parts.slice(i).join('-')
+      }
+      if (!validIdentifierStartCharacter) {
+        baseName = 'M-' + baseName
+      }
       return this.getClosestAvailableNameTo(baseName)
     }
 
