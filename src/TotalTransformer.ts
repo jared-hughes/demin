@@ -4,21 +4,12 @@ import * as estraverse from 'estraverse'
 import escodegen from 'escodegen'
 import { emit } from './lib'
 import { DeminifyOptions } from './deminify'
+import { DefineFunc } from './TransformerBase'
 
 // transformers
 import TransformRequires from './transformers/TransformRequires'
 import TransformerBase from './TransformerBase'
 import TransformTrivials from './transformers/TransformTrivials'
-
-type StringLiteral = { value: string } & estree.Literal
-
-export type DefineFunc = {
-  arguments: [
-    StringLiteral,
-    { elements: StringLiteral[] } & estree.ArrayExpression,
-    { params: estree.Identifier[] } & estree.FunctionExpression,
-  ]
-} & estree.CallExpression
 
 // mixin
 export default class TotalTransformer extends TransformTrivials(
@@ -75,18 +66,26 @@ export default class TotalTransformer extends TransformTrivials(
     // I suggest https://astexplorer.net/ to find the JSON to generate
     // for replacements.
     if (!this.currentModuleDefineNode && this.isDefineFunc(node, true)) {
-      this.currentModuleDefineNode = node
-      this.onEnterModule(node)
+      const currentModuleDefineNode = node
+      this.currentModuleDefineNode = currentModuleDefineNode
+      this.currentModuleFunctionNode = node.arguments[2]
+      this.enterModuleTransformers.forEach((func) =>
+        func(currentModuleDefineNode),
+      )
     }
     this.enterTransformers.forEach((func) => func(node, parent))
   }
 
   transformLeave(node: estree.Node, parent: estree.Node | null) {
+    const currentModuleDefineNode = this.currentModuleDefineNode
     if (
       node === this.currentModuleDefineNode &&
-      this.currentModuleFunctionNode !== null
+      this.currentModuleFunctionNode !== null &&
+      currentModuleDefineNode !== null
     ) {
-      this.onLeaveModule()
+      this.leaveModuleTransformers.forEach((func) =>
+        func(currentModuleDefineNode),
+      )
       // emit
       const customProgram: estree.Program = {
         type: 'Program',

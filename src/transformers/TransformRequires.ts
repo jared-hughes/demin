@@ -2,7 +2,7 @@ import * as estree from 'estree'
 import Case from 'case'
 import TrackScope from './TrackScope'
 import { clearAssign, start, end } from '../lib'
-import { DefineFunc } from '../TotalTransformer'
+import { DefineFunc } from '../TransformerBase'
 
 type DefaultRequireMemberExpression = estree.MemberExpression & {
   object: estree.Identifier
@@ -116,6 +116,12 @@ export default function TransformRequires<
     constructor(...args: any[]) {
       super(args)
       this.leaveTransformers.push(this.requiresLeaveTransformer.bind(this))
+      this.enterModuleTransformers.push(
+        this.requiresEnterModuleTransformer.bind(this),
+      )
+      this.leaveModuleTransformers.push(
+        this.requireLeaveModuleTransformer.bind(this),
+      )
     }
 
     getVariableNameForModule(moduleName: string) {
@@ -163,9 +169,8 @@ export default function TransformRequires<
       return newName
     }
 
-    onEnterModule(node: DefineFunc) {
+    requiresEnterModuleTransformer(node: DefineFunc) {
       const args = node.arguments
-      this.currentModuleFunctionNode = args[2]
       this.identifiersUsedInCurrentModule = new Set()
       this.moduleIdentifiers = []
       const dependencies = args[1].elements.map((e) => e.value)
@@ -292,7 +297,7 @@ export default function TransformRequires<
       addImportsToTop()
     }
 
-    onLeaveModule() {
+    requireLeaveModuleTransformer() {
       this.insertImports()
       this.identifiersUsedInCurrentModule.clear()
       this.dependencyMap.clear()
