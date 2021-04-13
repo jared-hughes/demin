@@ -1,7 +1,7 @@
 import { parse } from 'acorn'
 import * as estree from 'estree'
 import estraverse from 'estraverse'
-import Transformer from './transform'
+import TotalTransformer from './TotalTransformer'
 
 import { rmdir, readFile } from 'fs/promises'
 
@@ -24,9 +24,9 @@ async function deminifyFile(definePath: string, opts: DeminifyOptions) {
   const parsed = parse(source, {
     ecmaVersion: 6,
   }) as estree.Node
-  const transformer = new Transformer(parsed, opts)
+  const transformer = new TotalTransformer(parsed, opts)
   estraverse.traverse(parsed, {
-    enter: (node) => transformer.transformEnter(node),
+    enter: (node, parent) => transformer.transformEnter(node, parent),
     leave: (node, parent) => transformer.transformLeave(node, parent),
   })
 }

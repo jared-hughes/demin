@@ -1,6 +1,7 @@
 import { writeFile } from 'fs/promises'
 import * as prettier from 'prettier'
 import * as path from 'path'
+import * as estree from 'estree'
 import mkdirp from 'mkdirp'
 import { DeminifyOptions } from './deminify'
 
@@ -33,4 +34,21 @@ export function clearAssign(to: any, from: any) {
     delete to[prop]
   }
   Object.assign(to, from)
+}
+
+// `AcornNode`, `start`, and `end` are introduced to avoid the pain of
+// extensive casting because estree.Node does not specify `start` and `end`
+// (estree.Node.range is optional annoyingly, creating a need for null checks)
+
+type AcornNode = {
+  start: number
+  end: number
+} & estree.Node
+
+export function start(node: estree.Node) {
+  return (node as AcornNode).start
+}
+
+export function end(node: estree.Node) {
+  return (node as AcornNode).end
 }
