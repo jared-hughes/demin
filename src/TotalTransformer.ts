@@ -1,11 +1,14 @@
 import * as estree from 'estree'
 import TrackScope from './transformers/TrackScope'
-import TransformRequires from './transformers/TransformRequires'
-import TransformerBase from './TransformerBase'
 import * as estraverse from 'estraverse'
 import escodegen from 'escodegen'
 import { emit } from './lib'
 import { DeminifyOptions } from './deminify'
+
+// transformers
+import TransformRequires from './transformers/TransformRequires'
+import TransformerBase from './TransformerBase'
+import TransformTrivials from './transformers/TransformTrivials'
 
 type StringLiteral = { value: string } & estree.Literal
 
@@ -58,8 +61,8 @@ function isDefineFunc(
 }
 
 // mixin
-export default class TotalTransformer extends TransformRequires(
-  TrackScope(TransformerBase),
+export default class TotalTransformer extends TransformTrivials(
+  TransformRequires(TrackScope(TransformerBase)),
 ) {
   constructor(ast: estree.Node, opts: DeminifyOptions) {
     super(ast, opts)
