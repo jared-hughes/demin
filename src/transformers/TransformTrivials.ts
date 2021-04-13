@@ -8,7 +8,7 @@ export default function TransformTrivials<TBase extends TransformerConstructor>(
   return class TransformsTrivials extends Base {
     constructor(...args: any[]) {
       super(args)
-      this.leaveTransformers.push(this.scopeLeaveTransformer.bind(this))
+      this.leaveTransformers.push(this.trivialsLeaveTransformer.bind(this))
     }
 
     tryTransformVoid0(node: estree.UnaryExpression) {
@@ -38,7 +38,7 @@ export default function TransformTrivials<TBase extends TransformerConstructor>(
       }
     }
 
-    scopeLeaveTransformer(node: estree.Node) {
+    trivialsLeaveTransformer(node: estree.Node) {
       if (node.type === 'UnaryExpression') {
         this.tryTransformVoid0(node)
         this.tryTransformTrueFalse(node)
