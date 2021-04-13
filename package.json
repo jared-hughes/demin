@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "acorn": "^8.1.0",
+    "case": "^1.6.3",
     "escodegen": "^2.0.0",
     "escope": "^3.6.0",
     "estraverse": "^5.2.0",
