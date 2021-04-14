@@ -1,6 +1,6 @@
 # Demin
 
-Demin is a node CLI application for deminifying compiled AMD <sup>(?)</sup> files. Demin does **not** guarantee that output code that executes identically to the source file; do not expect the code to export. The intent **is** to produce somewhat-readable code.z
+Demin is a node CLI application for de-minifying (de-compiling) compiled AMD <sup>(?)</sup> files. Demin does **not** guarantee that output code that executes identically to the source file; do not expect the code to export. The intent **is** to produce somewhat-readable code.z
 
 ## Example Transformation
 
@@ -47,9 +47,8 @@ Currently-planned features:
 ## Installation
 
 ```bash
-git clone https://github.com/jared-hughes/requirejs-decompile demin
-npm install
-npm run build
+git clone https://github.com/jared-hughes/demin demin
+cd demin && npm install && npm run build
 sudo npm install -g .
 ```
 
@@ -58,7 +57,7 @@ This installs `demin` to your `$PATH`, so you can call it like the example usage
 ## Uninstall
 
 ```bash
-sudo npm uninstall -g requirejs-decompile
+sudo npm uninstall -g demin
 ```
 
 ## Usage

@@ -1,5 +1,5 @@
 {
-  "name": "requirejs-decompile",
+  "name": "demin",
   "version": "0.1.0",
   "description": "",
   "main": "bin/demin.js",
