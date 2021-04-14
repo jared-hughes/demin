@@ -8,15 +8,19 @@ import { rmdir, readFile } from 'fs/promises'
 export interface DeminifyOptions {
   dry: boolean
   outputFolder: string
+  clean: boolean
   limit: number
   prettier: boolean
   logging: 'none' | 'verbose'
 }
 
-async function deminifyFile(definePath: string, opts: DeminifyOptions) {
+export default async function deminifyFile(
+  definePath: string,
+  opts: DeminifyOptions,
+) {
   const source = (await readFile(definePath)).toString()
 
-  if (!opts.dry) {
+  if (opts.clean && !opts.dry) {
     await rmdir(opts.outputFolder, {
       recursive: true,
     })
@@ -31,11 +35,3 @@ async function deminifyFile(definePath: string, opts: DeminifyOptions) {
     leave: (node, parent) => transformer.transformLeave(node, parent),
   })
 }
-
-deminifyFile('./calculator.js', {
-  outputFolder: 'output',
-  dry: false,
-  limit: Infinity,
-  prettier: true,
-  logging: 'verbose',
-})

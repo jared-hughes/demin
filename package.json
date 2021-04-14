@@ -2,7 +2,10 @@
   "name": "requirejs-decompile",
   "version": "0.1.0",
   "description": "",
-  "main": "deminify.js",
+  "main": "bin/demin.js",
+  "bin": {
+    "demin": "./bin/demin.js"
+  },
   "scripts": {
     "build": "tsc --build",
     "serve": "ts-node --files ./src/deminify.ts",
@@ -17,7 +20,8 @@
     "escodegen": "^2.0.0",
     "escope": "^3.6.0",
     "estraverse": "^5.2.0",
-    "mkdirp": "^1.0.4"
+    "mkdirp": "^1.0.4",
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
     "@types/escodegen": "0.0.6",
