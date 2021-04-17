@@ -240,7 +240,7 @@ export default function TransformRequires<
               )
               defaultDependencyNameMap.set(moduleName, name)
             }
-            clearAssign(node, {
+            clearAssign(node.memberExpression, {
               type: 'Identifier',
               name: defaultDependencyNameMap.get(moduleName),
             })
