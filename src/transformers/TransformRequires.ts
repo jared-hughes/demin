@@ -105,7 +105,7 @@ function validIdentifierStartCharacter(id: string) {
 
 // Mixin pattern following http://web.archive.org/web/20210304140204/https://www.typescriptlang.org/docs/handbook/mixins.html
 export default function TransformRequires<
-  TBase extends ReturnType<typeof TrackScope>
+  TBase extends ReturnType<typeof TrackScope>,
 >(Base: TBase) {
   return class TransformsRequires extends Base {
     // map from variable name → module name (whose require() result is assigned to that variable)
@@ -282,7 +282,8 @@ export default function TransformRequires<
             },
           })
         }
-        const statementList = this.getCurrentModuleStatementList() as estree.Program['body']
+        const statementList =
+          this.getCurrentModuleStatementList() as estree.Program['body']
         if (statementList !== null) {
           statementList.unshift(...importsToInsert)
         }

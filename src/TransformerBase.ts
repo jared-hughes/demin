@@ -41,5 +41,5 @@ export default class TransformerBase {
   }
 }
 
-export type GConstructor<T = {}> = new (...args: any[]) => T
+export type GConstructor<T = object> = new (...args: any[]) => T
 export type TransformerConstructor = GConstructor<TransformerBase>
