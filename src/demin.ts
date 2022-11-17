@@ -4,7 +4,9 @@ import yargs from 'yargs'
 import deminifyFile from './deminify'
 
 const options = yargs
-  .usage('Usage: TODO')
+  .usage(
+    'Deminify a file to a directory.\nUsage: $0 -i <input> -o <output_dir>',
+  )
   .options({
     input: {
       alias: 'i',
