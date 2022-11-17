@@ -2,9 +2,9 @@
   "name": "demin",
   "version": "0.1.0",
   "description": "",
-  "main": "bin/demin.js",
+  "main": "dist/demin.js",
   "bin": {
-    "demin": "./bin/demin.js"
+    "demin": "./dist/demin.js"
   },
   "scripts": {
     "build": "tsc --build",
@@ -30,6 +30,7 @@
     "@types/mkdirp": "^1.0.2",
     "@types/node": "^18.11.9",
     "@types/prettier": "^2.7.1",
+    "@types/yargs": "^17.0.13",
     "@typescript-eslint/eslint-plugin": "^5.43.0",
     "@typescript-eslint/parser": "^5.43.0",
     "@typescript-eslint/typescript-estree": "^5.43.0",
