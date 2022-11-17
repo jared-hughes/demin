@@ -34,14 +34,13 @@ export default class TotalTransformer extends TransformTrivials(
         args.length === 3 &&
         args[0].type === 'Literal' &&
         typeof args[0].value === 'string' &&
+        !args[0].value.includes('!') &&
         args[1].type === 'ArrayExpression' &&
         args[1].elements.every(
           (e) =>
             e !== null && e.type === 'Literal' && typeof e.value === 'string',
         ) &&
         args[2].type === 'FunctionExpression' &&
-        // must include require
-        args[2].params.length >= 1 &&
         args[2].params.every((e) => e.type === 'Identifier')
       if (isDefine) {
         return true
