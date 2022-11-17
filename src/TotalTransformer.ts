@@ -23,28 +23,65 @@ export default class TotalTransformer extends TransformTrivials(
     this.opts = opts
   }
 
-  isDefineFunc(node: estree.Node, warnOnUnhandled = false): node is DefineFunc {
+  isDefineFunc(node: estree.CallExpression): node is DefineFunc {
+    const args = node.arguments
+    return (
+      args.length === 3 &&
+      args[0].type === 'Literal' &&
+      typeof args[0].value === 'string' &&
+      !args[0].value.includes('!') &&
+      args[1].type === 'ArrayExpression' &&
+      args[1].elements.every(
+        (e) =>
+          e !== null && e.type === 'Literal' && typeof e.value === 'string',
+      ) &&
+      args[2].type === 'FunctionExpression' &&
+      args[2].params.every((e) => e.type === 'Identifier')
+    )
+  }
+
+  transformEnter(node: estree.Node, parent: estree.Node | null) {
+    // I suggest https://astexplorer.net/ to find the JSON to generate
+    // for replacements.
     if (
+      !this.currentModuleDefineNode &&
       node.type === 'CallExpression' &&
       node.callee.type === 'Identifier' &&
       node.callee.name === 'define'
     ) {
       const args = node.arguments
-      const isDefine =
-        args.length === 3 &&
+      if (this.isDefineFunc(node)) {
+        // Regular define
+        const currentModuleDefineNode = node
+        this.currentModuleDefineNode = currentModuleDefineNode
+        this.currentModuleFunctionNode = node.arguments[2]
+        this.enterModuleTransformers.forEach((func) =>
+          func(currentModuleDefineNode),
+        )
+      } else if (
         args[0].type === 'Literal' &&
         typeof args[0].value === 'string' &&
-        !args[0].value.includes('!') &&
+        args[0].value.startsWith('text!') &&
         args[1].type === 'ArrayExpression' &&
-        args[1].elements.every(
-          (e) =>
-            e !== null && e.type === 'Literal' && typeof e.value === 'string',
-        ) &&
+        args[1].elements.length === 0 &&
         args[2].type === 'FunctionExpression' &&
-        args[2].params.every((e) => e.type === 'Identifier')
-      if (isDefine) {
-        return true
-      } else if (warnOnUnhandled) {
+        args[2].params.length === 0
+      ) {
+        // Plain text emit
+        const body = args[2].body.body
+        if (
+          body.length === 1 &&
+          body[0].type === 'ReturnStatement' &&
+          body[0].argument?.type === 'Literal' &&
+          typeof body[0].argument.value === 'string'
+        ) {
+          emit(args[0].value.slice('text!'.length), body[0].argument.value, {
+            ...this.opts,
+            prettier: false,
+          })
+        }
+      } else {
+        // Warn unhandled
         const module = args[0].type === 'Literal' ? args[0].value : ''
         if (this.opts.logging === 'verbose') {
           console.warn(
@@ -57,20 +94,6 @@ export default class TotalTransformer extends TransformTrivials(
           )
         }
       }
-    }
-    return false
-  }
-
-  transformEnter(node: estree.Node, parent: estree.Node | null) {
-    // I suggest https://astexplorer.net/ to find the JSON to generate
-    // for replacements.
-    if (!this.currentModuleDefineNode && this.isDefineFunc(node, true)) {
-      const currentModuleDefineNode = node
-      this.currentModuleDefineNode = currentModuleDefineNode
-      this.currentModuleFunctionNode = node.arguments[2]
-      this.enterModuleTransformers.forEach((func) =>
-        func(currentModuleDefineNode),
-      )
     }
     this.enterTransformers.forEach((func) => func(node, parent))
   }
