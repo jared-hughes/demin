@@ -78,9 +78,8 @@ export default class TotalTransformer extends TransformTrivials(
   transformLeave(node: estree.Node, parent: estree.Node | null) {
     const currentModuleDefineNode = this.currentModuleDefineNode
     if (
-      node === this.currentModuleDefineNode &&
-      this.currentModuleFunctionNode !== null &&
-      currentModuleDefineNode !== null
+      node === currentModuleDefineNode &&
+      this.currentModuleFunctionNode !== null
     ) {
       this.leaveModuleTransformers.forEach((func) =>
         func(currentModuleDefineNode),
@@ -92,7 +91,7 @@ export default class TotalTransformer extends TransformTrivials(
         body: this.currentModuleFunctionNode.body.body,
       }
       const bodyOut = escodegen.generate(customProgram)
-      emit(this.currentModuleDefineNode.arguments[0].value, bodyOut, this.opts)
+      emit(currentModuleDefineNode.arguments[0].value, bodyOut, this.opts)
       this.currentModuleFunctionNode = null
       this.currentModuleDefineNode = null
       this.defineFuncCount += 1
