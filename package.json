@@ -1,6 +1,6 @@
 {
   "name": "demin",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "De-minifier for some compiled AMD files",
   "main": "dist/demin.js",
   "bin": {
