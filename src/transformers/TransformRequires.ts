@@ -139,7 +139,7 @@ export default function TransformRequires<
       ) {
         baseName = parts.slice(i).join('-')
       }
-      if (!validIdentifierStartCharacter) {
+      if (!validIdentifierStartCharacter(baseName)) {
         baseName = 'M-' + baseName
       }
       return this.getClosestAvailableNameTo(baseName)
